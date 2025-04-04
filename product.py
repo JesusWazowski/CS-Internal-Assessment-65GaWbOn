@@ -80,7 +80,7 @@ sf.grid(row=1, column=1, padx=5, pady=5)
 crm_servings.grid(row=1, column=1, padx=5, pady=5)
 
 cf = ttk.LabelFrame(r2, text="Cost", relief="ridge") # Frame for cost input
-crm_cost = ttk.Spinbox(cf, from_=0.00, to=1000, increment=0.50, width=8) # Spinbox for selecting cost of recipe
+crm_cost = ttk.Spinbox(cf, from_=0.00, to=1000.00, increment=5.00, width=8) # Spinbox for selecting cost of recipe
 dollarSign = ttk.Label(cf, text="$") # Label for dollar sign
 dollarSign.grid(row=1, column=0, padx=(5, 0), pady=5, sticky="e") # Position dollar sign to the left of the cost input
 cf.grid(row=1, column=2, padx=5, pady=5)
