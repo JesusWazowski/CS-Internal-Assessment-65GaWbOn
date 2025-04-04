@@ -1,7 +1,8 @@
 import tkinter as tk
-from tkinter import StringVar, ttk
+from tkinter import BooleanVar, StringVar, ttk
 import uuid
 import json 
+import os
 
 root = tk.Tk()
 root.title("Dinner Machine v0.1")
@@ -55,16 +56,22 @@ crm_link = ttk.Entry(lf)
 lf.grid(row=1, column=3, padx=5, pady=5)
 crm_link.grid(row=1, column=1, padx=5, pady=5)
 
+### Initializing checkbox values to False
+W = BooleanVar()
+X = BooleanVar()
+Y = BooleanVar()
+Z = BooleanVar()
 of = ttk.LabelFrame(r1, text="Liked?", relief="ridge") # Frame for family opinions per recipe
-crm_opinion1 = ttk.Checkbutton(of, text="W")
-crm_opinion2 = ttk.Checkbutton(of, text="X")
-crm_opinion3 = ttk.Checkbutton(of, text="Y")
-crm_opinion4 = ttk.Checkbutton(of, text="Z")
+crm_opinion1 = ttk.Checkbutton(of, text="W", onvalue=True, offvalue=False, variable=W) # Checkbutton for family opinions
+crm_opinion2 = ttk.Checkbutton(of, text="X", onvalue=True, offvalue=False, variable=X)
+crm_opinion3 = ttk.Checkbutton(of, text="Y", onvalue=True, offvalue=False, variable=Y)
+crm_opinion4 = ttk.Checkbutton(of, text="Z", onvalue=True, offvalue=False, variable=Z)
 of.grid(row=1, column=4, padx=5, pady=5)
 crm_opinion1.grid(row=1, column=1)
 crm_opinion2.grid(row=1, column=2)
 crm_opinion3.grid(row=2, column=1)
 crm_opinion4.grid(row=2, column=2)
+
 
 nf = ttk.LabelFrame(r1, text="Notes", relief="ridge") # Frame for notes input
 crm_notes = ttk.Entry(nf, width=30)
@@ -141,22 +148,35 @@ trv.column(11, width=50, anchor="center") # Edit
 ### End GUI code            ###
 ### Data functions below    ###
 
+file_path = os.path.join(os.path.dirname(__file__), "recipes.json") # Location of JSON file, global variable for easy editing
+
 def load_json_from_file():
     global recipe_list
-    with open("c:\\tmp\\recipes.json", "r") as file_handler:
-        recipe_list = json.load(file_handler)
+    if os.path.exists(file_path):
+        with open(file_path, "r") as file_handler:
+            recipe_list = json.load(file_handler)
+    else: # If the file doesn't exist, create it
+        with open(file_path, "w") as file_handler:
+            json.dump([], file_handler)  # Create an empty JSON array
+        print(f"File created: {file_path}")
     print('file has been read and closed')
 
 
 def save_json_to_file():
     global recipe_list
-    with open("c:\\tmp\\recipes.json", "w") as file_handler:
-        json.dump(recipe_list, file_handler, indent=4)
+    if os.path.exists(file_path):
+        with open(file_path, "w") as file_handler:
+            json.dump(recipe_list, file_handler, indent=4)
+    else: # If the file doesn't exist, create it, same as above
+        with open(file_path, "w") as file_handler:
+            json.dump([], file_handler)
+        print(f"File created: {file_path}")
+        save_json_to_file() # Call the function again to save the data
     print('file has been written to and closed')
 
 
 
-def remove_all_data_from_trv():
+def remove_all_data_from_trv(): # Used to clear the treeview, which prevents duplicate data entries
     for item in trv.get_children():
         trv.delete(item)
     
@@ -170,10 +190,36 @@ def load_trv_with_json():
 
     for key in recipe_list:
         guid_value = key["id"]
-        name_ = key["name"]
+        name = key["name"]
 
         trv.insert('', index='end', iid=rowIndex, text="",
                    values=(guid_value, first_name, last_name, cell_phone))
         rowIndex = rowIndex + 1
 
+def clear_all_fields():
+    # Clear Entries
+    crm_name.delete(0,'end')
+    crm_protein.delete(0,'end')
+    crm_notes.delete(0,'end')
+    crm_link.delete(0,'end')
+    # Clear spinboxes
+    crm_servings.delete(0,'end')
+    crm_cost.delete(0,'end')
+    crm_prep.delete(0,'end')
+    crm_cleanup.delete(0,'end')
+    # Clear checkboxes
+    crm_opinion1.deselect()
+    crm_opinion2.deselect()
+    crm_opinion3.deselect()
+    crm_opinion4.deselect()
+    crm_health.deselect()
+
+    crm_name.focus_set()
+    id_value.set(uuid.uuid4())
+
+# Automatically load storage, if there is one
+load_json_from_file()
+load_trv_with_json()
+
+crm_name.focus_set()
 root.mainloop()
