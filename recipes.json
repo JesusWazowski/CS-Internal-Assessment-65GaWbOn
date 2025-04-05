@@ -1,1 +1,18 @@
-[]
+[
+    {
+        "id": "8f59bd02-c173-43b3-b0d3-908f70f44965",
+        "name": "Burgers",
+        "protein": "Ground beef",
+        "servings": "4",
+        "cost": "25.0",
+        "prep": "25",
+        "cleanup": "15",
+        "lowfat": "No",
+        "link": "ATK",
+        "notes": "Lettuce tomato optional",
+        "W": "Yes",
+        "X": "Yes",
+        "Y": "Yes",
+        "Z": "Yes"
+    }
+]
