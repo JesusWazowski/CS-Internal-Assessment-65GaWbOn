@@ -44,9 +44,31 @@ crm_name = ttk.Entry(nf)
 nf.grid(row=1, column=1, padx=5, pady=5)
 crm_name.grid(row=1, column=1, padx=5, pady=5)
 
+def addProtein(protein): # Function to add a new protein to the list of options
+    print("THIS IS A DEBUG MESSAGE")
+    if protein not in proteinValues: # Check if the protein is already in the list
+        proteinValues.append(protein) # Add the new protein to the list
+        with open(proteins_file_path, "a") as f: # Append the new protein to the file
+            f.write(f"\n{protein}") # Add a newline character before adding the new protein
+    else:
+        print(f"{protein} is already in the list of proteins.")
+
+# Define the absolute path for proteins.txt
+proteins_file_path = os.path.join(os.path.dirname(__file__), "proteins.txt")
+
+proteinValues = []  # Initialize list of proteins saved by the user
+if not os.path.exists(proteins_file_path):  # Check if the file doesn't exist, and create it if it doesn't
+    with open(proteins_file_path, "w") as f:
+        f.write("Ground beef\nChicken Breast\nChicken Thigh")  # Add a few default proteins
+        print(f"No proteins.txt file found. Creating a new one at {proteins_file_path}")  # Alert the user
+with open(proteins_file_path, "r") as f:  # Read the protein list from the file
+    proteinValues.clear()  # Clear the list to avoid duplicates
+    for line in f:
+        proteinValues.append(line.strip())  # Add each line to the list, removing the newline character
+
 pf = ttk.LabelFrame(r1, text="Protein", relief="ridge") # Frame for protein input
-crm_protein = ttk.Combobox(pf, values=["placeholder"], width=12)
-crm_proteinAdd = ttk.Button(pf, text="+", width=1,) # Button to add new proteins to the list of options
+crm_protein = ttk.Combobox(pf, values=proteinValues, width=16)
+crm_proteinAdd = ttk.Button(pf, text="+", width=1, command=lambda: addProtein(crm_protein.get())) # Corrected command to defer execution
 pf.grid(row=1, column=2, padx=5, pady=5)
 crm_protein.grid(row=1, column=1, padx=(5, 2), pady=5)
 crm_proteinAdd.grid(row=1, column=2, padx=(0, 5), pady=5)
@@ -56,21 +78,6 @@ crm_link = ttk.Entry(lf)
 lf.grid(row=1, column=3, padx=5, pady=5)
 crm_link.grid(row=1, column=1, padx=5, pady=5)
 
-### Initializing checkbox values to False
-W = BooleanVar()
-X = BooleanVar()
-Y = BooleanVar()
-Z = BooleanVar()
-of = ttk.LabelFrame(r1, text="Liked?", relief="ridge") # Frame for family opinions per recipe
-crm_opinion1 = ttk.Checkbutton(of, text="W", onvalue=True, offvalue=False, variable=W) # Checkbutton for family opinions
-crm_opinion2 = ttk.Checkbutton(of, text="X", onvalue=True, offvalue=False, variable=X)
-crm_opinion3 = ttk.Checkbutton(of, text="Y", onvalue=True, offvalue=False, variable=Y)
-crm_opinion4 = ttk.Checkbutton(of, text="Z", onvalue=True, offvalue=False, variable=Z)
-of.grid(row=1, column=4, padx=5, pady=5)
-crm_opinion1.grid(row=1, column=1)
-crm_opinion2.grid(row=1, column=2)
-crm_opinion3.grid(row=2, column=1)
-crm_opinion4.grid(row=2, column=2)
 
 
 nf = ttk.LabelFrame(r1, text="Notes", relief="ridge") # Frame for notes input
@@ -100,8 +107,26 @@ tf.grid(row=1, column=3, padx=5, pady=5)
 crm_prep.grid(row=1, column=1, padx=(5, 4), pady=5, sticky="ew")
 crm_cleanup.grid(row=1, column=2, padx=(0, 5), pady=5, sticky="ew")
 
+### Initializing checkbox values to False
+W = BooleanVar()
+X = BooleanVar()
+Y = BooleanVar()
+Z = BooleanVar()
+of = ttk.LabelFrame(r2, text="Liked?", relief="ridge") # Frame for family opinions per recipe
+crm_opinionW = ttk.Checkbutton(of, text="W", onvalue=True, offvalue=False, variable=W) # Checkbutton for family opinions
+crm_opinionX = ttk.Checkbutton(of, text="X", onvalue=True, offvalue=False, variable=X) # Letters refer to initials, anonymized here
+crm_opinionY = ttk.Checkbutton(of, text="Y", onvalue=True, offvalue=False, variable=Y)
+crm_opinionZ = ttk.Checkbutton(of, text="Z", onvalue=True, offvalue=False, variable=Z)
+of.grid(row=1, column=5, padx=5, pady=5)
+crm_opinionW.grid(row=1, column=1)
+crm_opinionX.grid(row=1, column=2)
+crm_opinionY.grid(row=2, column=1)
+crm_opinionZ.grid(row=2, column=2)
+
+### Initializing checkbox value to False
+lowfat = "No" # default to unfilled value
 hf = ttk.LabelFrame(r2, text="Low-fat?", relief="ridge") # Frame for user defined health input
-crm_health = ttk.Checkbutton(hf, text="Yes") # Checkbutton for low-fat option
+crm_health = ttk.Checkbutton(hf, text="Yes", onvalue="Yes", offvalue="No", variable=lowfat) # Checkbutton for low-fat option
 hf.grid(row=1, column=4, padx=5, pady=5)
 crm_health.grid(row=1, column=1, padx=5, pady=5)
 
@@ -116,8 +141,9 @@ title.grid(row=1, column=1, columnspan=1, pady=2, padx=20)
 recipeView = ttk.Frame(mainScreen, borderwidth=5, relief="ridge")
 recipeView.grid(row=3, column=1, columnspan=3, sticky="nsew")
 
-trv = ttk.Treeview(recipeView, columns=(1,2,3,4,5,6,7,8,9,10,11), show="headings", height=10) # Treeview for displaying recipes
+trv = ttk.Treeview(recipeView, columns=(0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,), show="headings", height=10) # Treeview for displaying recipes
 trv.grid(row=1, column=1, columnspan=3, sticky="nsew")
+scrollbar = ttk.Scrollbar(trv, orient=tk.VERTICAL)
 recipeView.grid_rowconfigure(1, weight=1)
 recipeView.grid_columnconfigure(1, weight=1)
 
@@ -130,10 +156,14 @@ trv.heading(6, text="Cleanup" , anchor="center")
 trv.heading(7, text="Low-fat" , anchor="center")
 trv.heading(8, text="Recipe Link" , anchor="center")
 trv.heading(9, text="Notes" , anchor="center")
-trv.heading(10, text="Family Opinions" , anchor="center")
-trv.heading(11, text="Edit" , anchor="center")
+trv.heading(10, text="W" , anchor="center")
+trv.heading(11, text="X" , anchor="center")
+trv.heading(12, text="Y" , anchor="center")
+trv.heading(13, text="Z" , anchor="center")
+trv.heading(14, text="Last made" , anchor="center")
 
-trv.column(1, width=175, anchor="center", stretch=True) # Name
+trv.column(0, minwidth=0, width=0) # ID column for internal use, not displayed to user
+trv.column(1, width=90, anchor="center", stretch=True) # Name
 trv.column(2, width=100, anchor="center") # Protein
 trv.column(3, width=70, anchor="center") # Servings
 trv.column(4, width=70, anchor="center") # Cost/Serv
@@ -142,8 +172,11 @@ trv.column(6, width=70, anchor="center") # Cleanup Time
 trv.column(7, width=50, anchor="center") # Low-fat
 trv.column(8, width=75, anchor="center") # Recipe Link
 trv.column(9, width=150, anchor="center") # Notes
-trv.column(10, width=100, anchor="center") # Family Opinions
-trv.column(11, width=50, anchor="center") # Edit
+trv.column(10, width=25, anchor="center") # Family Opinion W
+trv.column(11, width=25, anchor="center") # Family Opinion X
+trv.column(12, width=25, anchor="center") # Family Opinion Y
+trv.column(13, width=25, anchor="center") # Family Opinion Z
+trv.column(14, width=90, anchor="center") # Edit
 
 ### End GUI code            ###
 ### Data functions below    ###
@@ -191,9 +224,23 @@ def load_trv_with_json():
     for key in recipe_list:
         guid_value = key["id"]
         name = key["name"]
+        protein = key["protein"]
+        servings = key["servings"]
+        cost = key["cost"]
+        prep = key["prep"]
+        cleanup = key["cleanup"]
+        lowfat = key["lowfat"]
+        link = key["link"]
+        notes = key["notes"]
+        opinionW = key["W"]
+        opinionX = key["X"]
+        opinionY = key["Y"]
+        opinionZ = key["Z"]
+
+
 
         trv.insert('', index='end', iid=rowIndex, text="",
-                   values=(guid_value, first_name, last_name, cell_phone))
+                   values=(guid_value, name, protein, servings, cost, prep, cleanup, lowfat, link, notes, opinionW, opinionX, opinionY, opinionZ))
         rowIndex = rowIndex + 1
 
 def clear_all_fields():
@@ -208,14 +255,214 @@ def clear_all_fields():
     crm_prep.delete(0,'end')
     crm_cleanup.delete(0,'end')
     # Clear checkboxes
-    crm_opinion1.deselect()
-    crm_opinion2.deselect()
-    crm_opinion3.deselect()
-    crm_opinion4.deselect()
-    crm_health.deselect()
+    crm_opinionW = False
+    crm_opinionX = False
+    crm_opinionY = False
+    crm_opinionZ = False
+    crm_health = "No"
 
     crm_name.focus_set()
     id_value.set(uuid.uuid4())
+
+### Simple search function for IDs
+def find_row_in_recipe_list(guid_value):
+    global recipe_list
+    row     = 0
+    found   = False
+
+    for rec in recipe_list:
+        if rec["id"] == guid_value:
+            found = True
+            break
+        row = row+1
+
+    if(found==True):
+        return(row)
+
+    return(-1)
+
+### Regulate functions of buttons that control data based on if data is selected or not ###
+def change_enabled_state(state):
+
+    if state == 'Edit':
+        btnUpdate["state"]="normal"
+        btnDelete["state"]="normal"
+        btnAdd["state"]="disabled"
+    elif state=='Cancel':
+        btnUpdate["state"]="disabled"
+        btnDelete["state"]="disabled"
+        btnAdd["state"]="disabled"
+    else:
+        btnUpdate["state"]="disabled"
+        btnDelete["state"]="disabled"
+        btnAdd["state"]="normal"
+
+# --review=Y
+def load_edit_field_with_row_data(_tuple):
+    if len(_tuple)==0:
+        return;
+    print(_tuple)
+    #id_value.set(_tuple[0]);
+    clear_all_fields()
+    crm_name.insert(0,_tuple[1])
+    crm_protein.insert(0,_tuple[2])
+    crm_servings.insert(0,_tuple[3])
+    crm_cost.insert(0,_tuple[4])
+    crm_prep.insert(0,_tuple[5])
+    crm_cleanup.insert(0,_tuple[6])
+    lowfat.set(0,_tuple[7])
+    crm_link.insert(0,_tuple[8])
+    crm_notes.insert(0,_tuple[9])
+    W.set(0,_tuple[10])
+    X.set(0,_tuple[11])
+    Y.set(0,_tuple[12])
+    Z.set(0,_tuple[13])
+
+
+# --review=Y
+def cancel():
+    clear_all_fields()
+    change_enabled_state('New')
+
+# --review=Y
+def add_entry():
+    guid_value = id_value.get()
+    name = crm_name.get()
+    protein = crm_protein.get()
+    servings = crm_servings.get()
+    cost = crm_cost.get()
+    prep = crm_prep.get()
+    cleanup = crm_cleanup.get()
+    global lowfat # Used existing variable for lowfat checkbox
+    link = crm_link.get()
+    notes = crm_notes.get()
+    global W # Used existing variable for checkboxes here
+    global X
+    global Y
+    global Z
+
+    process_request('_INSERT_',guid_value,name,protein,servings,cost,prep,cleanup,lowfat,link,notes,W,X,Y,Z)
+
+
+# --review=Y
+def update_entry():
+    guid_value = id_value.get()
+    name = crm_name.get()
+    protein = crm_protein.get()
+    servings = crm_servings.get()
+    cost = crm_cost.get()
+    prep = crm_prep.get()
+    cleanup = crm_cleanup.get()
+    global lowfat # Once again used existing variable for lowfat checkbox
+    link = crm_link.get()
+    notes = crm_notes.get()
+    global W # Used existing variable for checkboxes here
+    global X
+    global Y
+    global Z
+
+    process_request('_UPDATE_',guid_value,name,protein,servings,cost,prep,cleanup,lowfat,link,notes,W,X,Y,Z)   
+
+
+
+# --review=Y
+def delete_entry():
+    guid_value = id_value.get()
+    process_request('_DELETE_',guid_value,None,None,None,None,None,None,None,None,None,None,None,None,None)
+ 
+
+
+# --review=Y
+def process_request(command_type, guid_value, name, protein, servings, cost, prep, cleanup, lowfat, link, notes, W, X, Y, Z):
+    global recipe_list
+
+    if command_type == "_UPDATE_":
+        row = find_row_in_recipe_list(guid_value)
+        if row >= 0:
+            dict = {
+                "id": guid_value,
+                "name": name,
+                "protein": protein,
+                "servings": servings,
+                "cost": cost,
+                "prep": prep,
+                "cleanup": cleanup,
+                "lowfat": lowfat,  # Retrieve the value of crm_health
+                "link": link,
+                "notes": notes,
+                "W": bool(W),
+                "X": bool(X),
+                "Y": bool(Y),
+                "Z": bool(Z)
+            }
+            recipe_list[row] = dict
+
+    elif command_type == "_INSERT_":
+        dict = {
+            "id": guid_value,
+            "name": name,
+            "protein": protein,
+            "servings": servings,
+            "cost": cost,
+            "prep": prep,
+            "cleanup": cleanup,
+            "lowfat": lowfat,  # Retrieve the value of crm_health
+            "link": link,
+            "notes": notes,
+            "W": bool(W),
+            "X": bool(X),
+            "Y": bool(Y),
+            "Z": bool(Z)
+        }
+        recipe_list.append(dict)
+
+    elif command_type == "_DELETE_":
+        row = find_row_in_recipe_list(guid_value)
+        if row >= 0:
+            del recipe_list[row]
+
+    save_json_to_file()
+    load_trv_with_json()
+    clear_all_fields()
+
+
+# --review=Y
+def MouseButtonUpCallBack(event):
+    currentRowIndex = trv.selection()[0]
+    lastTuple = (trv.item(currentRowIndex,'values'))
+    load_edit_field_with_row_data(lastTuple)
+
+    change_enabled_state('Edit')
+
+
+# --review=Y
+trv.bind("<ButtonRelease>",MouseButtonUpCallBack)
+
+
+# --review=
+ButtonFrame = ttk.Frame(r2, anchor="center")
+ButtonFrame.grid(row=1,column=99,columnspan=1, sticky="nsew")
+
+##save=Button(root,text="Save",padx=20,pady=10,command=Save)
+
+btnAdd=ttk.Button(ButtonFrame, text="Add", command=add_entry)
+btnAdd.grid(row=1, column=1, padx=1, pady=1)
+
+btnUpdate=ttk.Button(ButtonFrame, text="Update", command=update_entry)
+btnUpdate.grid(row=1, column=2, padx=1, pady=1)
+
+btnDelete=ttk.Button(ButtonFrame, text="Delete", command=delete_entry)
+btnDelete.grid(row=2, column=1, padx=1, pady=1)
+
+btnClear=ttk.Button(ButtonFrame, text="Cancel", command=cancel)
+btnClear.grid(row=2, column=2, padx=1, pady=1)
+
+##### Move this button to Search Frame probably
+#btnMake=ttk.Button(ButtonFrame, text="Make Recipe",) # Add date reset command here
+#btnMake.grid(row=1, column=3, padx=1, pady=1, rowspan=2)
+
+#btnExit=ttk.Button(ButtonFrame, text="Exit", command=root.quit)
+#btnExit.grid(row=1, column=5, padx=1, pady=1)
 
 # Automatically load storage, if there is one
 load_json_from_file()
