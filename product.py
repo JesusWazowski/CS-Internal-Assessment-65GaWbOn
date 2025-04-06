@@ -1,5 +1,5 @@
 import tkinter as tk
-from tkinter import BooleanVar, StringVar, ttk
+from tkinter import StringVar, ttk
 import uuid
 import json 
 import os
